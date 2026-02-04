@@ -16,8 +16,6 @@ const productSchema = new Schema(
     price: {
       type: Number,
       required: true,
-      lowercase: true,
-      trim: true,
     },
     image: {
       type: String,
@@ -28,8 +26,6 @@ const productSchema = new Schema(
     quantity: {
       type: Number,
       required: true,
-      lowercase: true,
-      trim: true,
     },
   },
   {
