@@ -1,9 +1,10 @@
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-function adminOnly(req, res, next) {
-    if (req.user.role !== "admin") {
-        return res.status(403).json({ message: "Only admins can access this route" });
+export const verifyAdmin = asyncHandler(async (req, res, next) => {
+    if (req.user && req.user.role === "admin") {
+        next();
+    } else {
+        throw new ApiError(403, "Access denied. Admin rights required.");
     }
-    next();
-}
-
-export { adminOnly };
+});

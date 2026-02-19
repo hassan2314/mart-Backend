@@ -32,17 +32,59 @@ app.use(cookieParser());
 
 
 //import rotuers
+
+
+
 import userRouter from "./routes/user.routes.js";
+
+
+
 import productRouter from "./routes/product.routes.js";
+
+
+
 import orderRouter from "./routes/order.routes.js";
+
+
+
 import blogRouter from "./routes/blog.routes.js";
 
+
+
+import adminRouter from "./routes/admin.routes.js"; // Import adminRouter
+
+
+
+
+
+
+
 app.use("/api/v1/products", productRouter);
+
+
+
 app.use("/api/v1/users", userRouter);
+
+
+
 app.use("/api/v1/orders", orderRouter);
+
+
+
 app.use("/api/v1/blogs", blogRouter);
 
 
 
+app.use("/api/v1/admin", adminRouter); // Use adminRouter
+
+
+
+
+
+
+
 app.use(errorHandler);
+
+
+
 export { app };

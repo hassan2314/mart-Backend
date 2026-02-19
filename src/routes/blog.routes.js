@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
-import { adminOnly } from "../middleware/admin.middleware.js";
+import { verifyAdmin } from "../middleware/admin.middleware.js"; // Corrected import
 import { upload } from "../middleware/multer.middleware.js";
 import {
   getBlogs,
@@ -15,13 +15,12 @@ const router = Router();
 router
   .route("/")
   .get(getBlogs)
-  .post(verifyJwt, adminOnly, upload.single("image"), createBlog);
+  .post(verifyJwt, verifyAdmin, upload.single("image"), createBlog); // Corrected usage
 
 router
   .route("/:id")
   .get(getBlogById)
-  .put(verifyJwt, adminOnly, updateBlog)
-  .patch(verifyJwt, adminOnly, upload.single("image"), updateBlog)
-  .delete(verifyJwt, adminOnly, deleteBlog);
+  .put(verifyJwt, verifyAdmin, upload.single("image"), updateBlog) // Corrected usage, assuming updateBlog handles image changes
+  .delete(verifyJwt, verifyAdmin, deleteBlog); // Corrected usage
 
 export default router;

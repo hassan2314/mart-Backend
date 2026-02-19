@@ -59,6 +59,7 @@ const userSchema = new Schema(
     },
     { timestamps: true }
 );
+userSchema.index({ createdAt: -1 });
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next;
     this.password = await bcript.hash(this.password, 10);
