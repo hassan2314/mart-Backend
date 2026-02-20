@@ -14,7 +14,8 @@ const getBlogs = asyncHandler(async (req, res) => {
 
   const blogs = await Blog.find(filter)
     .populate("author", "fullname username")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
   return res
     .status(200)
@@ -28,7 +29,9 @@ const getBlogById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid blog ID");
   }
 
-  const blog = await Blog.findById(id).populate("author", "fullname username");
+  const blog = await Blog.findById(id)
+    .populate("author", "fullname username")
+    .lean();
 
   if (!blog) {
     throw new ApiError(404, "Blog not found");

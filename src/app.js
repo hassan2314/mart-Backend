@@ -1,9 +1,30 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import compression from "compression";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
 const app = express();
+
+app.use(compression());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: "Too many requests, please try again later." },
+});
+app.use("/api/", limiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { success: false, message: "Too many auth attempts, please try again later." },
+});
+app.use("/api/v1/users/login", authLimiter);
+app.use("/api/v1/users/register", authLimiter);
 
 const corsOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())

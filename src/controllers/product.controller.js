@@ -40,7 +40,7 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
+  const products = await Product.find({}).lean();
 
   return res
     .status(200)
@@ -49,7 +49,7 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const product = await Product.findById(id);
+  const product = await Product.findById(id).lean();
 
   if (!product) {
     return res
@@ -119,7 +119,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
   if (!product) {
     throw new ApiError(404, "Product not found");
   }
-  await deleteFromCloudinary(product.image);
+  if (product.image) {
+    const publicId = product.image.split("/").pop().split(".")[0];
+    await deleteFromCloudinary(publicId);
+  }
   await Product.findByIdAndDelete(id);
   return res
     .status(200)

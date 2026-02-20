@@ -18,6 +18,14 @@ const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
+  const productIds = [...new Set(orderItems.map((item) => item.product).filter(Boolean))];
+  const products = await Product.find({ _id: { $in: productIds } }).lean();
+
+  if (products.length !== productIds.length) {
+    throw new ApiError(404, "One or more products not found");
+  }
+
+  const productMap = new Map(products.map((p) => [p._id.toString(), p]));
   const validatedItems = [];
   let totalAmount = 0;
 
@@ -28,7 +36,7 @@ const createOrder = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Each order item must have product, quantity, and price");
     }
 
-    const product = await Product.findById(productId);
+    const product = productMap.get(productId.toString());
     if (!product) {
       throw new ApiError(404, `Product not found: ${productId}`);
     }
@@ -40,7 +48,7 @@ const createOrder = asyncHandler(async (req, res) => {
       );
     }
 
-    const itemTotal = price * quantity;
+    const itemTotal = product.price * quantity;
     totalAmount += itemTotal;
 
     validatedItems.push({
@@ -63,11 +71,13 @@ const createOrder = asyncHandler(async (req, res) => {
     shippingAddress,
   });
 
-  for (const item of validatedItems) {
-    await Product.findByIdAndUpdate(item.product, {
-      $inc: { quantity: -item.quantity },
-    });
-  }
+  const bulkOps = validatedItems.map((item) => ({
+    updateOne: {
+      filter: { _id: item.product },
+      update: { $inc: { quantity: -item.quantity } },
+    },
+  }));
+  await Product.bulkWrite(bulkOps);
 
   const populatedOrder = await Order.findById(order._id)
     .populate("orderItems.product", "name image")
@@ -83,7 +93,8 @@ const createOrder = asyncHandler(async (req, res) => {
 const getMyOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find({ user: req.user._id })
     .populate("orderItems.product", "name image price")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .lean();
 
   return res
     .status(200)
@@ -98,7 +109,8 @@ const getOrderById = asyncHandler(async (req, res) => {
   }
 
   const order = await Order.findById(id)
-    .populate("orderItems.product", "name image price");
+    .populate("orderItems.product", "name image price")
+    .lean();
 
   if (!order) {
     throw new ApiError(404, "Order not found");
