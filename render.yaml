@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: mart-backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Add these as secret env vars in Render dashboard:
+      # PORT (auto-set by Render for web services)
+      # MONGODB_URI, CORS_ORIGIN
+      # ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET
+      # ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY
+      # CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+      # INVITATION_TOKEN_SECRET, INVITATION_TOKEN_EXPIRY
