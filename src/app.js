@@ -83,23 +83,11 @@ import adminRouter from "./routes/admin.routes.js"; // Import adminRouter
 
 
 
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/products", productRouter);
-
-
-
 app.use("/api/v1/users", userRouter);
-
-
-
 app.use("/api/v1/orders", orderRouter);
-
-
-
 app.use("/api/v1/blogs", blogRouter);
-
-
-
-app.use("/api/v1/admin", adminRouter); // Use adminRouter
 
 
 

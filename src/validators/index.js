@@ -56,6 +56,12 @@ export const updateProductValidator = [
     .withMessage("Quantity must be a non-negative integer"),
 ];
 
+export const updateOrderStatusValidator = [
+  body("status")
+    .isIn(["pending", "paid", "shipped", "delivered", "cancelled"])
+    .withMessage("Invalid status"),
+];
+
 export const createOrderValidator = [
   body("orderItems")
     .isArray({ min: 1 })

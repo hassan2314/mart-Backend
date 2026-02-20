@@ -125,4 +125,47 @@ const getOrderById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, order, "Order fetched successfully."));
 });
 
-export { createOrder, getMyOrders, getOrderById };
+const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find()
+    .populate("user", "fullname email")
+    .populate("orderItems.product", "name image price")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, orders, "All orders fetched successfully."));
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid order ID");
+  }
+
+  const validStatuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
+  if (!status || !validStatuses.includes(status)) {
+    throw new ApiError(400, `Status must be one of: ${validStatuses.join(", ")}`);
+  }
+
+  const order = await Order.findByIdAndUpdate(
+    id,
+    { status },
+    { new: true }
+  )
+    .populate("user", "fullname email")
+    .populate("orderItems.product", "name image price")
+    .lean();
+
+  if (!order) {
+    throw new ApiError(404, "Order not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, order, "Order status updated successfully."));
+});
+
+export { createOrder, getMyOrders, getOrderById, getAllOrders, updateOrderStatus };
