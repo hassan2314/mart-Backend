@@ -8,6 +8,9 @@ import { errorHandler } from "./middleware/errorHandler.middleware.js";
 
 const app = express();
 
+// Trust proxy (required behind Render, Nginx, etc.) so express-rate-limit can read X-Forwarded-For
+app.set("trust proxy", 1);
+
 app.use(compression());
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
