@@ -130,11 +130,11 @@ const loginUser = asyncHandler(async (req, res) => {
   // Retrieve user details without sensitive fields (password, refreshToken)
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-  // Set cookie options
+  // Set cookie options (sameSite: "none" required for cross-origin in production)
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",  // Secure cookies only in production
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
   };
 
   // Send response with tokens and user details
@@ -160,11 +160,11 @@ const logoutUser = asyncHandler(async (req, res) => {
     // Remove the refresh token from the user's document
     await User.findByIdAndUpdate(req.user._id, { $unset: { refreshToken: 1 } });
 
-    // Clear cookies
+    // Clear cookies (same options as login for proper clearing)
     const options = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Secure cookies only in production
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     };
 
     return res
@@ -201,6 +201,7 @@ const refreshToken = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     };
     return res
       .status(200)
@@ -420,7 +421,7 @@ const registerInvitedManager = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     };
 
     return res

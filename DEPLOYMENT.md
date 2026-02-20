@@ -2,13 +2,17 @@
 
 ## Required Settings (Render Dashboard)
 
-If deploying manually (without `render.yaml`), configure these in your Render service:
+This repo ([mart-Backend](https://github.com/hassan2314/mart-Backend)) has a flat structure—`package.json` is at the root. No Root Directory is needed.
+
+If deploying manually (without Blueprint), configure these in your Render service:
 
 | Setting | Value |
 |---------|-------|
-| **Root Directory** | `Backend` (when deploying from Mart repo root) |
+| **Root Directory** | Leave empty |
 | **Build Command** | `npm install` |
 | **Start Command** | `npm start` |
+
+The `render.yaml` in this repo applies these settings when using Render Blueprint.
 
 ## Environment Variables
 
