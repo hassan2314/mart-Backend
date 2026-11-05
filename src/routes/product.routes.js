@@ -9,6 +9,7 @@ import {
 } from "../controllers/product.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { verifyAdmin } from "../middleware/admin.middleware.js"; // Corrected import
+import { rejectReadOnly } from "../middleware/demoAccess.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
 import {
   validate,
@@ -24,6 +25,7 @@ router
   .post(
     verifyJwt,
     verifyAdmin, // Corrected usage
+    rejectReadOnly,
     upload.single("image"),
     validate(createProductValidator),
     createProduct
@@ -32,8 +34,8 @@ router
 router
   .route("/:id")
   .get(getProductById)
-  .put(verifyJwt, verifyAdmin, validate(updateProductValidator), updateProduct) // Corrected usage
-  .delete(verifyJwt, verifyAdmin, deleteProduct) // Corrected usage
-  .patch(verifyJwt, verifyAdmin, upload.single("image"), updateImage); // Corrected usage
+  .put(verifyJwt, verifyAdmin, rejectReadOnly, validate(updateProductValidator), updateProduct)
+  .delete(verifyJwt, verifyAdmin, rejectReadOnly, deleteProduct)
+  .patch(verifyJwt, verifyAdmin, rejectReadOnly, upload.single("image"), updateImage);
 
 export default router;

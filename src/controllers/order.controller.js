@@ -18,6 +18,16 @@ const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
+  if (user.isDemo) {
+    const demoOrderCount = await Order.countDocuments({ user: user._id });
+    if (demoOrderCount >= 25) {
+      throw new ApiError(
+        403,
+        "Demo account order limit reached. This keeps the shared catalog from filling with demo checkouts."
+      );
+    }
+  }
+
   const productIds = [...new Set(orderItems.map((item) => item.product).filter(Boolean))];
   const products = await Product.find({ _id: { $in: productIds } }).lean();
 
@@ -71,13 +81,16 @@ const createOrder = asyncHandler(async (req, res) => {
     shippingAddress,
   });
 
-  const bulkOps = validatedItems.map((item) => ({
-    updateOne: {
-      filter: { _id: item.product },
-      update: { $inc: { quantity: -item.quantity } },
-    },
-  }));
-  await Product.bulkWrite(bulkOps);
+  // Demo checkouts are recorded for the order-history view and do not change catalog stock.
+  if (!user.isDemo) {
+    const bulkOps = validatedItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity } },
+      },
+    }));
+    await Product.bulkWrite(bulkOps);
+  }
 
   const populatedOrder = await Order.findById(order._id)
     .populate("orderItems.product", "name image")

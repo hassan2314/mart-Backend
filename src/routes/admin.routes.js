@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { verifyAdmin } from "../middleware/admin.middleware.js";
+import { rejectReadOnly } from "../middleware/demoAccess.middleware.js";
 import { getDashboardStats } from "../controllers/admin.controller.js";
 import { getAllOrders, updateOrderStatus } from "../controllers/order.controller.js";
 import { validate, updateOrderStatusValidator } from "../validators/index.js";
@@ -14,6 +15,7 @@ router.patch(
   "/orders/:id",
   verifyJwt,
   verifyAdmin,
+  rejectReadOnly,
   validate(updateOrderStatusValidator),
   updateOrderStatus
 );

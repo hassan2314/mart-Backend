@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "start": "node -r dotenv/config src/index.js"
+    "start": "node -r dotenv/config src/index.js",
+    "seed:demo": "node -r dotenv/config src/seeds/demoUsers.js",
+    "test": "node --test src/middleware/demoAccess.test.js"
   },
   "keywords": [],
   "author": "",
