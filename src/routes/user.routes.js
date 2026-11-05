@@ -3,6 +3,11 @@ import { upload } from "../middleware/multer.middleware.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { verifyAdmin } from "../middleware/admin.middleware.js"; // Import verifyAdmin
 import {
+  rejectDemoCredentialChange,
+  rejectDemoIdentityChange,
+  rejectReadOnly,
+} from "../middleware/demoAccess.middleware.js";
+import {
   validate,
   registerValidator,
   loginValidator,
@@ -40,13 +45,25 @@ router.route("/current-user").get(verifyJwt, getCurrentUser);
 
 router
   .route("/update")
-  .patch(verifyJwt, upload.single("avatar"), updateProfile);
+  .patch(
+    verifyJwt,
+    rejectReadOnly,
+    rejectDemoIdentityChange,
+    upload.single("avatar"),
+    updateProfile
+  );
 router
   .route("/change-password")
-  .put(verifyJwt, validate(changePasswordValidator), currentPasswordChange);
+  .put(
+    verifyJwt,
+    rejectReadOnly,
+    rejectDemoCredentialChange,
+    validate(changePasswordValidator),
+    currentPasswordChange
+  );
 
 // Admin routes
-router.route("/invite-manager").post(verifyJwt, verifyAdmin, inviteManager);
+router.route("/invite-manager").post(verifyJwt, verifyAdmin, rejectReadOnly, inviteManager);
 router.route("/register-manager").post(registerInvitedManager); // Public route for invited managers to register
 
 // Admin user management routes
@@ -54,7 +71,7 @@ router.route("/users").get(verifyJwt, verifyAdmin, getAllUsers);
 router
   .route("/users/:userId")
   .get(verifyJwt, verifyAdmin, getUserDetails)
-  .put(verifyJwt, verifyAdmin, updateUserRole) // Assuming update user role
-  .delete(verifyJwt, verifyAdmin, deleteUser);
+  .put(verifyJwt, verifyAdmin, rejectReadOnly, updateUserRole)
+  .delete(verifyJwt, verifyAdmin, rejectReadOnly, deleteUser);
 
 export default router;

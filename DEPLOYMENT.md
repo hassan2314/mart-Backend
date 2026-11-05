@@ -30,5 +30,6 @@ Set these in Render (Settings → Environment). Use **Secret Files** or **Enviro
 - `CLOUDINARY_API_SECRET`
 - `INVITATION_TOKEN_SECRET`
 - `INVITATION_TOKEN_EXPIRY`
+- `SEED_DEMO_ACCOUNTS` (optional). Leave unset to create the public demo customer and read-only admin from the README. Set to `false` to skip them. This is not a secret.
 
 See `.env.example` for reference values.

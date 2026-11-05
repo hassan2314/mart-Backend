@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
+import { rejectReadOnly } from "../middleware/demoAccess.middleware.js";
 import {
   createOrder,
   getMyOrders,
@@ -11,7 +12,7 @@ const router = Router();
 
 router
   .route("/")
-  .post(verifyJwt, validate(createOrderValidator), createOrder)
+  .post(verifyJwt, rejectReadOnly, validate(createOrderValidator), createOrder)
   .get(verifyJwt, getMyOrders);
 router.route("/:id").get(verifyJwt, getOrderById);
 

@@ -35,6 +35,15 @@ const userSchema = new Schema(
             enum: ["user", "admin"], 
             default: "user"
          },
+         // Public demo accounts. readOnly admins can open the admin UI but cannot mutate data.
+         readOnly: {
+            type: Boolean,
+            default: false,
+         },
+         isDemo: {
+            type: Boolean,
+            default: false,
+         },
          phoneNumber: {
             type: String,
             require: [true, "Please Enter Phone Number"],
